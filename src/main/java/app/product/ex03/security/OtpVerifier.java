@@ -2,10 +2,7 @@ package app.product.ex03.security;
 
 import org.springframework.stereotype.Component;
 
-/**
- * Simple OTP verification component. In a real system this would check an
- * external OTP provider. For this exercise we accept exactly "123456".
- */
+
 @Component
 public class OtpVerifier {
 

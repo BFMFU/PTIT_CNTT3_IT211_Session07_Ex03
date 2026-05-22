@@ -20,34 +20,21 @@ public class OtpSecurityAspect {
 
     @Around("@annotation(app.product.ex03.security.RequiresOTP)")
     public Object aroundRequiresOtp(ProceedingJoinPoint pjp) throws Throwable {
-        MethodSignature sig = (MethodSignature) pjp.getSignature();
-        Method method = sig.getMethod();
         Object[] args = pjp.getArgs();
 
-        // Find OTP argument: by convention we expect the OTP to be the last String parameter
         String otp = null;
-        Class<?>[] paramTypes = sig.getParameterTypes();
-        if (paramTypes != null && paramTypes.length > 0) {
-            for (int i = paramTypes.length - 1; i >= 0; i--) {
-                if (paramTypes[i].equals(String.class)) {
-                    Object val = args[i];
-                    otp = val == null ? null : val.toString();
-                    break;
-                }
+        for (int i = args.length - 1; i >= 0; i--) {
+            if (args[i] instanceof String) {
+                otp = (String) args[i];
+                break;
             }
         }
 
-        // Check for empty/null OTP -> return a meaningful failure message (match the examples)
-        if (otp == null || otp.trim().isEmpty()) {
+        if (otp == null || otp.isBlank() || !otpVerifier.verify(otp)) {
+            Method method = ((MethodSignature) pjp.getSignature()).getMethod();
             return failureMessageFor(method.getName());
         }
 
-        // Verify OTP
-        if (!otpVerifier.verify(otp)) {
-            return failureMessageFor(method.getName());
-        }
-
-        // proceed when OTP is valid
         return pjp.proceed();
     }
 

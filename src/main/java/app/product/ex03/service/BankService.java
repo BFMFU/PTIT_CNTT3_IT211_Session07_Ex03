@@ -19,7 +19,6 @@ public class BankService {
     }
 
     public String getBalance(String user) {
-        // Not sensitive - no OTP required
         return "Số dư của " + user + " là 1000";
     }
 }
